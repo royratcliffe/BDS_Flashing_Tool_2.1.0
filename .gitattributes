@@ -1,0 +1,14 @@
+# Normalise text files to LF in the repository.
+* text=auto
+
+# Explicitly set line endings for specific file types.
+*.py   text eol=lf
+*.ini  text eol=lf
+*.bat  text eol=crlf
+*.log  text eol=lf
+
+# Keep generated and packaged assets byte-for-byte.
+*.dll  binary
+*.exe  binary
+*.pdf  binary
+*.hex  binary
