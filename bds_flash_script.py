@@ -2,13 +2,14 @@ import ConfigParser
 import os
 import subprocess
 
+
 def parse_hex_line(line):
     """
     Parses an Intel HEX line and returns its components.
     """
     if line[0] != ":":
         raise ValueError("Invalid Intel HEX line")
-    
+
     byte_count = int(line[1:3], 16)
     address = int(line[3:7], 16)
     record_type = int(line[7:9], 16)
@@ -25,14 +26,16 @@ def calculate_checksum(byte_count, address, record_type, data):
         [byte_count]
         + [address >> 8, address & 0xFF]
         + [record_type]
-        + [int(data[i:i+2], 16) for i in range(0, len(data), 2)]
+        + [int(data[i : i + 2], 16) for i in range(0, len(data), 2)]
     )
     checksum = (-(sum(checksum_data) & 0xFF)) & 0xFF
     return checksum
 
+
 def get_config_file_for_hex():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, 'config.ini')
+    return os.path.join(script_dir, "config.ini")
+
 
 def read_config_for_hex(config_file_path):
     """Read the configuration file and return the configparser object."""
@@ -41,18 +44,30 @@ def read_config_for_hex(config_file_path):
         config_for_hex.read(config_file_path)
         return config_for_hex
     except IOError:
-        print("Error: The configuration file '{}' does not exist.".format(config_file_path))
+        print(
+            "Error: The configuration file '{}' does not exist.".format(
+                config_file_path
+            )
+        )
         return None
+
 
 def get_hex_file_path_from_config(config_for_hex):
     try:
-        return config_for_hex.get('CONFIGURATION', 'BDS_MEM_ASW_DS_PATH')  # Access the 'command' option under 'settings' section
+        return config_for_hex.get(
+            "CONFIGURATION", "BDS_MEM_ASW_DS_PATH"
+        )  # Access the 'command' option under 'settings' section
     except ConfigParser.NoOptionError as e:
-        print("Error: Missing configuration option 'command' in 'settings' section: {}".format(e))
+        print(
+            "Error: Missing configuration option 'command' in 'settings' section: {}".format(
+                e
+            )
+        )
     except ConfigParser.NoSectionError as e:
         print("Error: Missing section 'settings' in config file: {}".format(e))
-    return None 
-    
+    return None
+
+
 def sort_and_process_hex(hex_file):
     """
     Sorts an Intel Hex file by record type 4 (extended linear address) and writes the result.
@@ -123,10 +138,12 @@ def sort_and_process_hex(hex_file):
 
     print("Processed Intel Hex file saved to: {}".format(hex_file))
 
+
 def get_config_file_path_for_bat():
     """Retrieve the dynamic path to the configuration file."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, 'FlashingUtilities\python_script_config.ini')
+    return os.path.join(script_dir, "FlashingUtilities\\python_script_config.ini")
+
 
 def read_config_for_bat(config_file_path):
     """Read the configuration file and return the configparser object."""
@@ -135,38 +152,52 @@ def read_config_for_bat(config_file_path):
         config.read(config_file_path)
         return config
     except IOError:
-        print("Error: The configuration file '{}' does not exist.".format(config_file_path))
+        print(
+            "Error: The configuration file '{}' does not exist.".format(
+                config_file_path
+            )
+        )
         return None
+
 
 def get_batch_file_path(config):
     """Retrieve the batch file path from the configuration file."""
     try:
-        return os.path.join(os.path.abspath(os.path.dirname(__file__)), config.get('SETTING', 'BDS_FLASH_BAT_PATH'))  # Access the 'command' option under 'settings' section
+        return os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            config.get("SETTING", "BDS_FLASH_BAT_PATH"),
+        )  # Access the 'command' option under 'settings' section
     except ConfigParser.NoOptionError as e:
-        print("Error: Missing configuration option 'command' in 'settings' section: {}".format(e))
+        print(
+            "Error: Missing configuration option 'command' in 'settings' section: {}".format(
+                e
+            )
+        )
     except ConfigParser.NoSectionError as e:
         print("Error: Missing section 'settings' in config file: {}".format(e))
     return None
+
 
 def execute_batch_file(bat_file_path):
     """Execute the batch file if it exists."""
     if os.path.exists(bat_file_path):
         try:
             os.chdir(os.path.dirname(bat_file_path))
-            os.system('cmd.exe /k ' + bat_file_path + ' & pause')
+            os.system("cmd.exe /k " + bat_file_path + " & pause")
         except Exception as e:
             print("Error while executing the batch file:", e)
     else:
         print("Error: The batch file does not exist at path:", bat_file_path)
 
+
 def execute_batch_file_from_config():
     """Main function to coordinate reading config and executing batch file."""
     # Get the path to the config file for hex file dynamically
-    config_file_path_for_hex=get_config_file_for_hex()
+    config_file_path_for_hex = get_config_file_for_hex()
 
-    config_for_hex=read_config_for_hex(config_file_path_for_hex)
+    config_for_hex = read_config_for_hex(config_file_path_for_hex)
 
-    hex_file=get_hex_file_path_from_config(config_for_hex)
+    hex_file = get_hex_file_path_from_config(config_for_hex)
 
     # Modify the hex file specified in config.ini (in-place modification)
     sort_and_process_hex(hex_file)
@@ -187,8 +218,9 @@ def execute_batch_file_from_config():
     # Execute the batch file
     execute_batch_file(bat_file_path)
 
+
 if __name__ == "__main__":
-    #current_dir = os.getcwd()
+    # current_dir = os.getcwd()
     print(os.getcwd())
     execute_batch_file_from_config()
-    #os.chdir(current_dir)
+    # os.chdir(current_dir)
