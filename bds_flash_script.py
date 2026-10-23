@@ -142,7 +142,7 @@ def sort_and_process_hex(hex_file):
 def get_config_file_path_for_bat():
     """Retrieve the dynamic path to the configuration file."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, "FlashingUtilities\python_script_config.ini")
+    return os.path.join(script_dir, "FlashingUtilities\\python_script_config.ini")
 
 
 def read_config_for_bat(config_file_path):
